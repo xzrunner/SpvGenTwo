@@ -117,6 +117,8 @@ namespace spvgentwo
 		// remove Function or EntryPoint, returns list of Instructions which consumed the function (calls outside the function itself)
 		// _pAllocator to use for allocating List<Instruction*> (use modules allocator if nullptr)
 		List<Instruction*> remove(const Function* _pFunction, Function* _pReplacementToCall = nullptr, IAllocator* _pAllocator = nullptr);
+		// copy from remove() without remove old func
+		List<Instruction*> replace(const Function* _pFunction, Function* _pReplacementToCall, IAllocator* _pAllocator = nullptr);
 
 		// add empty entry point
 		EntryPoint& addEntryPoint();
