@@ -267,6 +267,36 @@ spvgentwo::List<spvgentwo::Instruction*> spvgentwo::Module::remove(const Functio
 	return uses;
 }
 
+spvgentwo::List<spvgentwo::Instruction*> spvgentwo::Module::replace(const Function* _pFunction, Function* _pReplacementToCall, IAllocator* _pAllocator)
+{
+	List<Instruction*> uses(_pAllocator == nullptr ? getAllocator() : _pAllocator);
+
+	if (_pFunction == nullptr)
+	{
+		return uses;
+	}
+
+	const Instruction* opFunction = _pFunction->getFunction();
+	Instruction* opFunctionReplacement = _pReplacementToCall != nullptr ? _pReplacementToCall->getFunction() : nullptr;
+
+	auto gatherUse = [opFunction, opFunctionReplacement, &uses](Instruction& instr)
+	{
+		for (auto it = instr.getFirstActualOperand(), end = instr.end(); it != end; ++it)
+		{
+			if (*it == opFunction) // need to check use of OpFunctionparameter?
+			{
+				*it = opFunctionReplacement;
+				uses.emplace_back(&instr);
+				break;
+			}
+		}
+	};
+
+	iterateInstructions(gatherUse);
+
+	return uses;
+}
+
 spvgentwo::EntryPoint& spvgentwo::Module::addEntryPoint()
 {
 	return m_EntryPoints.emplace_back(this);
